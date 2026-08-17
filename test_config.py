@@ -36,8 +36,8 @@ class ConfigTests(unittest.TestCase):
         self.addCleanup(lambda: Path(handle.name).unlink(missing_ok=True))
         return Path(handle.name)
 
-    def test_load_repo_config_file(self):
-        data = load_config()
+    def test_load_example_config_file(self):
+        data = load_config(Path(__file__).resolve().parent / "config.example.yaml")
         self.assertEqual(data.get("mode"), "demo")
         self.assertIn("demo", data)
         self.assertIn("appkey", data["demo"])
