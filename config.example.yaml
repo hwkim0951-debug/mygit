@@ -1,0 +1,25 @@
+# 키움 REST API 설정 예시
+# 저장소 폴더에서 이 파일을 config.yaml 으로 복사한 뒤 모의투자 키를 넣으세요.
+#   copy config.example.yaml config.yaml
+# 실행:
+#   python issue_token.py
+#   또는 issue_token.bat
+# 주의: config.yaml 은 git에 올리지 마세요.
+
+# demo: 모의투자  /  real: 실전투자
+mode: demo
+
+demo:
+  # ▼ 키움 OpenAPI 포털의 "모의투자" 앱에서 복사
+  appkey: ""
+  secretkey: ""
+  account: ""
+  base_url: "https://mockapi.kiwoom.com"
+  ws_url: "wss://mockapi.kiwoom.com:10000"
+
+real:
+  appkey: ""
+  secretkey: ""
+  account: ""
+  base_url: "https://api.kiwoom.com"
+  ws_url: "wss://api.kiwoom.com:10000"
