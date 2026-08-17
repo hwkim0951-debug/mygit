@@ -26,10 +26,11 @@ class IssueTokenTests(unittest.TestCase):
             patch("issue_token.get_active_credentials", return_value=creds),
             patch("issue_token.requests.post") as post,
             patch("issue_token.TOKEN_CACHE") as cache,
+            patch("issue_token.load_cached_token", return_value=None),
         ):
             post.return_value.status_code = 200
             post.return_value.json.return_value = payload
-            record = issue_token()
+            record = issue_token(force=True)
 
         self.assertEqual(record["token"], "abc123token")
         args, kwargs = post.call_args
@@ -60,7 +61,7 @@ class IssueTokenTests(unittest.TestCase):
             post.return_value.status_code = 200
             post.return_value.json.return_value = payload
             with self.assertRaises(TokenError) as ctx:
-                issue_token()
+                issue_token(force=True)
         self.assertIn("8001", str(ctx.exception))
         self.assertIn("모의투자 앱", str(ctx.exception))
 

@@ -76,6 +76,16 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(mask_secret("abcd1234"), "abcd****")
         self.assertEqual(mask_secret(""), "(비어 있음)")
 
+    def test_strips_wrapped_quotes_from_keys(self):
+        data = dict(SAMPLE)
+        data["demo"] = dict(SAMPLE["demo"])
+        data["demo"]["appkey"] = '"demo-key-1234"'
+        data["demo"]["secretkey"] = "'demo-secret-5678'"
+        path = self._write(data)
+        creds = get_active_credentials(path)
+        self.assertEqual(creds["appkey"], "demo-key-1234")
+        self.assertEqual(creds["secretkey"], "demo-secret-5678")
+
 
 if __name__ == "__main__":
     unittest.main()

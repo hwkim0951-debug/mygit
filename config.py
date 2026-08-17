@@ -27,9 +27,16 @@ def load_config(path: Path | str = CONFIG_PATH) -> dict[str, Any]:
     return data
 
 
+def _clean_secret(value: str) -> str:
+    cleaned = value.strip().strip("\ufeff")
+    if len(cleaned) >= 2 and cleaned[0] == cleaned[-1] and cleaned[0] in {'"', "'"}:
+        cleaned = cleaned[1:-1].strip()
+    return cleaned
+
+
 def _first_nonempty(section: dict[str, Any], *keys: str) -> str:
     for key in keys:
-        value = str(section.get(key) or "").strip()
+        value = _clean_secret(str(section.get(key) or ""))
         if value:
             return value
     return ""
