@@ -1,4 +1,4 @@
-"""Load trading credentials from config.yaml."""
+"""Load Kiwoom REST API credentials from config.yaml."""
 
 from __future__ import annotations
 
@@ -27,46 +27,55 @@ def load_config(path: Path | str = CONFIG_PATH) -> dict[str, Any]:
     return data
 
 
+def _first_nonempty(section: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = str(section.get(key) or "").strip()
+        if value:
+            return value
+    return ""
+
+
 def get_active_credentials(path: Path | str = CONFIG_PATH) -> dict[str, str]:
-    """Return App Key / App Secret for the mode set in config.yaml."""
+    """Return appkey / secretkey for the mode set in config.yaml."""
     data = load_config(path)
-    mode = str(data.get("mode") or "paper").strip().lower()
-    if mode not in {"paper", "real"}:
-        raise ConfigError(f"지원하지 않는 mode 입니다: {mode!r} (paper 또는 real)")
+    mode = str(data.get("mode") or "demo").strip().lower()
+    if mode == "paper":
+        mode = "demo"
+    if mode not in {"demo", "real"}:
+        raise ConfigError(f"지원하지 않는 mode 입니다: {mode!r} (demo 또는 real)")
 
     section = data.get(mode)
     if not isinstance(section, dict):
         raise ConfigError(f"config.yaml 에 '{mode}' 항목이 없습니다.")
 
-    app_key = str(section.get("app_key") or "").strip()
-    app_secret = str(section.get("app_secret") or "").strip()
+    appkey = _first_nonempty(section, "appkey", "app_key")
+    secretkey = _first_nonempty(section, "secretkey", "app_secret", "secret_key")
     account = str(section.get("account") or "").strip().replace("-", "")
-    account_product_code = str(section.get("account_product_code") or "01").strip()
     base_url = str(section.get("base_url") or "").strip()
+    ws_url = str(section.get("ws_url") or "").strip()
 
     missing = [
         name
         for name, value in (
-            ("app_key", app_key),
-            ("app_secret", app_secret),
+            ("appkey", appkey),
+            ("secretkey", secretkey),
         )
         if not value
     ]
     if missing:
         joined = ", ".join(missing)
+        label = "모의투자" if mode == "demo" else "실전투자"
         raise ConfigError(
-            f"모의투자 인증값이 비어 있습니다. config.yaml 의 {mode}.{joined} 를 채워 주세요."
-            if mode == "paper"
-            else f"실전투자 인증값이 비어 있습니다. config.yaml 의 {mode}.{joined} 를 채워 주세요."
+            f"{label} 인증값이 비어 있습니다. config.yaml 의 {mode}.{joined} 를 채워 주세요."
         )
 
     return {
         "mode": mode,
-        "app_key": app_key,
-        "app_secret": app_secret,
+        "appkey": appkey,
+        "secretkey": secretkey,
         "account": account,
-        "account_product_code": account_product_code,
         "base_url": base_url,
+        "ws_url": ws_url,
     }
 
 
@@ -85,9 +94,9 @@ if __name__ == "__main__":
         print(f"[설정 오류] {exc}")
         raise SystemExit(1) from exc
 
-    label = "모의투자" if creds["mode"] == "paper" else "실전투자"
-    print(f"현재 mode: {creds['mode']} ({label})")
-    print(f"App Key   : {mask_secret(creds['app_key'])}")
-    print(f"App Secret: {mask_secret(creds['app_secret'])}")
+    label = "모의투자" if creds["mode"] == "demo" else "실전투자"
+    print(f"현재 mode : {creds['mode']} ({label})")
+    print(f"appkey    : {mask_secret(creds['appkey'])}")
+    print(f"secretkey : {mask_secret(creds['secretkey'])}")
     print(f"계좌번호  : {creds['account'] or '(미입력)'}")
     print(f"API URL   : {creds['base_url']}")

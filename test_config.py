@@ -8,20 +8,20 @@ from config import ConfigError, get_active_credentials, load_config, mask_secret
 
 
 SAMPLE = {
-    "mode": "paper",
-    "paper": {
-        "app_key": "paper-key-1234",
-        "app_secret": "paper-secret-5678",
+    "mode": "demo",
+    "demo": {
+        "appkey": "demo-key-1234",
+        "secretkey": "demo-secret-5678",
         "account": "50123456",
-        "account_product_code": "01",
-        "base_url": "https://openapivts.koreainvestment.com:29443",
+        "base_url": "https://mockapi.kiwoom.com",
+        "ws_url": "wss://mockapi.kiwoom.com:10000",
     },
     "real": {
-        "app_key": "real-key",
-        "app_secret": "real-secret",
+        "appkey": "real-key",
+        "secretkey": "real-secret",
         "account": "12345678",
-        "account_product_code": "01",
-        "base_url": "https://openapi.koreainvestment.com:9443",
+        "base_url": "https://api.kiwoom.com",
+        "ws_url": "wss://api.kiwoom.com:10000",
     },
 }
 
@@ -38,18 +38,19 @@ class ConfigTests(unittest.TestCase):
 
     def test_load_repo_config_file(self):
         data = load_config()
-        self.assertEqual(data.get("mode"), "paper")
-        self.assertIn("paper", data)
-        self.assertIn("app_key", data["paper"])
-        self.assertIn("app_secret", data["paper"])
+        self.assertEqual(data.get("mode"), "demo")
+        self.assertIn("demo", data)
+        self.assertIn("appkey", data["demo"])
+        self.assertIn("secretkey", data["demo"])
 
-    def test_reads_paper_credentials_from_config(self):
+    def test_reads_demo_credentials_from_config(self):
         path = self._write(SAMPLE)
         creds = get_active_credentials(path)
-        self.assertEqual(creds["mode"], "paper")
-        self.assertEqual(creds["app_key"], "paper-key-1234")
-        self.assertEqual(creds["app_secret"], "paper-secret-5678")
+        self.assertEqual(creds["mode"], "demo")
+        self.assertEqual(creds["appkey"], "demo-key-1234")
+        self.assertEqual(creds["secretkey"], "demo-secret-5678")
         self.assertEqual(creds["account"], "50123456")
+        self.assertEqual(creds["base_url"], "https://mockapi.kiwoom.com")
 
     def test_reads_real_credentials_when_mode_is_real(self):
         data = dict(SAMPLE)
@@ -57,19 +58,19 @@ class ConfigTests(unittest.TestCase):
         path = self._write(data)
         creds = get_active_credentials(path)
         self.assertEqual(creds["mode"], "real")
-        self.assertEqual(creds["app_key"], "real-key")
-        self.assertEqual(creds["app_secret"], "real-secret")
+        self.assertEqual(creds["appkey"], "real-key")
+        self.assertEqual(creds["secretkey"], "real-secret")
 
-    def test_missing_paper_keys_raise(self):
+    def test_missing_demo_keys_raise(self):
         data = dict(SAMPLE)
-        data["paper"] = dict(SAMPLE["paper"])
-        data["paper"]["app_key"] = ""
-        data["paper"]["app_secret"] = ""
+        data["demo"] = dict(SAMPLE["demo"])
+        data["demo"]["appkey"] = ""
+        data["demo"]["secretkey"] = ""
         path = self._write(data)
         with self.assertRaises(ConfigError) as ctx:
             get_active_credentials(path)
-        self.assertIn("app_key", str(ctx.exception))
-        self.assertIn("app_secret", str(ctx.exception))
+        self.assertIn("appkey", str(ctx.exception))
+        self.assertIn("secretkey", str(ctx.exception))
 
     def test_mask_secret_hides_value(self):
         self.assertEqual(mask_secret("abcd1234"), "abcd****")

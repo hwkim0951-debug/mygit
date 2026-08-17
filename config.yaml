@@ -1,23 +1,22 @@
-# 한국투자증권 Open API 설정
-# 모의투자 App Key / App Secret은 이 파일만 수정하면 됩니다.
-# 발급: https://apiportal.koreainvestment.com  (모의투자 앱)
+# 키움 REST API 설정
+# 모의투자 appkey / secretkey 는 아래 demo 칸에 넣으면 됩니다.
+# 발급: https://openapi.kiwoom.com  (모의투자 앱)
 # 주의: 실제 키는 공개 저장소에 커밋하지 마세요. 로컬에서만 채워 사용하세요.
 
-# paper: 모의투자  /  real: 실전투자
-mode: paper
+# demo: 모의투자  /  real: 실전투자
+mode: demo
 
-paper:
-  # ▼ 모의투자용 App Key / App Secret을 여기에 넣으세요
-  app_key: ""
-  app_secret: ""
-  # 모의투자 계좌번호 8자리 (하이픈 없이)
+demo:
+  # ▼ 모의투자용 appkey / secretkey 를 따옴표 안에 넣으세요
+  appkey: ""
+  secretkey: ""
   account: ""
-  account_product_code: "01"
-  base_url: "https://openapivts.koreainvestment.com:29443"
+  base_url: "https://mockapi.kiwoom.com"
+  ws_url: "wss://mockapi.kiwoom.com:10000"
 
 real:
-  app_key: ""
-  app_secret: ""
+  appkey: ""
+  secretkey: ""
   account: ""
-  account_product_code: "01"
-  base_url: "https://openapi.koreainvestment.com:9443"
+  base_url: "https://api.kiwoom.com"
+  ws_url: "wss://api.kiwoom.com:10000"
